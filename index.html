@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WeiQi</title>
+    <link href="css/weiqi.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/weiqi.js"></script>
+<canvas id="ChessBoard" width="500" height="500" class="weiqi"></canvas>
+<script>
+    game.setup();
+    game.board[15] = 2;
+    game.flush();
+
+</script>
+
+</body>
+</html>
