@@ -1,5 +1,3 @@
-
-
 var app = {};
 var EDGE = 20;
 var LENGTH = 25;
@@ -41,18 +39,23 @@ var game = {
             var pos = calculatePos(mousePos);
             if (pos)
             {
-                game.drawChess(pos.x, pos.y, 1);
+                game.playAt(pos.x, pos.y, game.side);
+                //game.board[pos.x + pos.y * 19] = 1;
+                //game.drawChess(pos.x, pos.y, 1);
+                changeSide();
+                game.flush();
             }
-            console.log(mousePos.x, mousePos.y);
+            //console.log(mousePos.x, mousePos.y);
         });
 
+        game.side = 1;
 
     }
     ,
 
-
     drawBackground: function ()
     {
+        //set background color
         this.ctx.fillStyle = "#D9884B";
         this.ctx.fillRect(0, 0, 500, 500);
 
@@ -88,15 +91,31 @@ var game = {
 
     flush: function ()
     {
-        for (var i = 0; i < 18; i++)
-            for (var j = 0; j < 18; j++)
+        game.ctx.clearRect(0, 0, 500, 500);
+        game.drawBackground();
+
+        for (var i = 0; i <= 18; i++)
+            for (var j = 0; j <= 18; j++)
             {
                 if (this.board[i + j * 19] !== 0)
                 {
                     this.drawChess(i, j, this.board[i + j * 19]);
-                    console.log(i, j, this.board[i + j * 19]);
+                    //console.log(i, j, this.board[i + j * 19]);
                 }
             }
+    }
+    ,
+
+    playAt: function (x, y, side)
+    {
+        if (this.board[x + y * 19] === 0)
+        {
+            this.board[x + y * 19] = side;
+            this.flush();
+            return true;
+        }
+        console.log(x, y, "has been occupied");
+        return false;
 
 
     }
@@ -122,6 +141,7 @@ function calculatePos(Pos)
     y = y / LENGTH;
 
     console.log(x, y);
+
     var X = Math.floor(x);
     var Y = Math.floor(y);
 
@@ -134,6 +154,7 @@ function calculatePos(Pos)
         else
             return false;
     }
+
     if (y - Y >= 0.6)
         y = Y + 1;
     else
@@ -144,8 +165,24 @@ function calculatePos(Pos)
             return false;
     }
 
+    console.log(x, y);
+    // make sure the chess is in range
+    if (x > 18 || y > 18)
+    {
+        console.log("out of board range");
+        return false;
+    }
 
     return {x: x, y: y};
+
+}
+
+function changeSide()
+{
+    if (game.side === 1)
+        game.side = 2;
+    else
+        game.side = 1;
 
 }
 
