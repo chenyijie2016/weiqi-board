@@ -8,12 +8,16 @@
 <body>
 <script src="js/jquery-3.2.1.min.js"></script>
 <script src="js/weiqi.js"></script>
+<script src="js/test.js"></script>
 <canvas id="ChessBoard" width="500" height="500" class="weiqi"></canvas>
 <script>
+    game.init();
     game.setup();
     game.flush();
-
 </script>
-
+<br>
+<button onclick="game.setup()" id="start">(Re)Start</button>
+<button onclick="getScore()" id="score">Score</button>
+<button onclick="test()" id="test">Test</button>
 </body>
 </html>
