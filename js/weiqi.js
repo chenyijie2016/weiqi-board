@@ -4,6 +4,7 @@ var R = 12;
 var BLACK = 1;
 var WHITE = 2;
 var API_URL = 'http://localhost:5000';
+var app = {};
 
 
 var game = {
@@ -146,11 +147,11 @@ var game = {
 
         for (var i = 0; i < 19; i++)
             for (var j = 0; j < 19; j++) {
-                if (board[i + j * 19] == '1') {
+                if (board[i + j * 19] === 1) {
                     drawBox(i, j, BLACK);
                 }
                 else {
-                    if (board[i + j * 19] == '2')
+                    if (board[i + j * 19] === 2)
                         drawBox(i, j, WHITE);
                 }
 
@@ -245,5 +246,33 @@ function getScore() {
     $.post(API_URL + '/score', {'board': board, 'player_to_move': -1}, function (data) {
         console.log(data);
         game.showScores(data['board'])
+    })
+}
+
+function loadSGF() {
+    var target_file = $("#sgf_list").val();
+
+    $.get(API_URL + '/sgf/p/' + target_file, success = function (data) {
+        console.log(data);
+        game.board = data["board"];
+        game.flush();
+
+        $('#PB').text(data["black name"]);
+        $('#PW').text(data["white name"]);
+        $('#winner').text(data["winner"]);
+        $('#date').text(data["date"])
+
+    });
+
+}
+
+function getSGF() {
+    $.get(API_URL + '/sgf', success = function (data) {
+        console.log('[getSGF] INFO: ', data)
+        app.sgfs = data;
+
+        for (var i = 0; i < app.sgfs.length; i++) {
+            $('#sgf_list').append('<option >' + app.sgfs[i] + '</option>');
+        }
     })
 }

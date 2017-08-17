@@ -2,3 +2,38 @@
     margin: auto 0;
     border:1px solid #000000;
 }
+
+.plugin{
+    border: solid;
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 520px;
+    top: 220px;
+}
+
+.select{
+    width: 300px;
+}
+.info{
+    position: absolute;
+    left: 520px;
+    top: 0px;
+    width: 300px;
+    height: 200px;
+    border: dotted;
+    align-content: center;
+}
+.infotable{
+    border: solid;
+    border-width: thin;
+
+}
+tr {
+    width: 200px;
+}
+td {
+    text-align: center;
+    border: solid;
+    border-width: 1px;
+}
