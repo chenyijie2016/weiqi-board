@@ -252,17 +252,20 @@ function getScore() {
 function loadSGF() {
     var target_file = $("#sgf_list").val();
 
-    $.get(API_URL + '/sgf/p/' + target_file, success = function (data) {
-        console.log(data);
-        game.board = data["board"];
-        game.flush();
+    SGFViewer.currentGameName = target_file;
+    SGFViewer.gotoStep(1)
 
-        $('#PB').text(data["black name"]);
-        $('#PW').text(data["white name"]);
-        $('#winner').text(data["winner"]);
-        $('#date').text(data["date"])
-
-    });
+    // $.get(API_URL + '/sgf/p/' + target_file, success = function (data) {
+    //     console.log(data);
+    //     game.board = data["board"];
+    //     game.flush();
+    //
+    //     $('#PB').text(data["black name"]);
+    //     $('#PW').text(data["white name"]);
+    //     $('#winner').text(data["winner"]);
+    //     $('#date').text(data["date"])
+    //
+    // });
 
 }
 

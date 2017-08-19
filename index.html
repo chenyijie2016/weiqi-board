@@ -6,9 +6,10 @@
     <link href="css/weiqi.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+<script src="js/test.js"></script>
 <script src="js/jquery-3.2.1.min.js"></script>
 <script src="js/weiqi.js"></script>
-<script src="js/test.js"></script>
+
 <canvas id="ChessBoard" width="500" height="500" class="weiqi"></canvas>
 <div id="plugin" class="plugin">
     <form>
@@ -19,14 +20,25 @@
 
     <button onclick="getSGF()" id="get">Get SGF List</button>
     <button onclick="loadSGF()" id="load">Load SGF</button>
-    <button onclick="test()" id="test">Test</button>
+    <br>
+    STEP:&nbsp;&nbsp;<input id="currentstep" type="text" size="1">/<a id="totalstep">0</a>
+    <button onclick="SGFViewer.goto()">goto</button>
+
+
+    <br>
+    <button onclick="SGFViewer.begin()">begin</button>
+    <button onclick="SGFViewer.previous_more()"><<</button>
+    <button onclick="SGFViewer.previous()"><</button>
+    <button onclick="SGFViewer.next()">></button>
+    <button onclick="SGFViewer.next_more()">>></button>
+    <button onclick="SGFViewer.end()">end</button>
 </div>
 
 <div id="info" class="info">
     <table class="infotable">
         <tr>
-            <td>PLAYER BLACK</td>
-            <td>PLAYER WHITE</td>
+            <td width="175px">PLAYER BLACK</td>
+            <td width="175px">PLAYER WHITE</td>
         </tr>
         <tr>
             <td id="PB"></td>
@@ -42,7 +54,7 @@
             <td colspan="2">WINNER</td>
         </tr>
         <tr>
-            <td  colspan="2" id="winner"></td>
+            <td colspan="2" id="winner"></td>
         </tr>
     </table>
 </div>
@@ -50,6 +62,7 @@
     game.init();
     game.setup();
     game.flush();
+    getSGF();
 </script>
 <br>
 <button onclick="game.setup()" id="start">(Re)Start</button>
