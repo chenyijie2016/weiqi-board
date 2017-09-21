@@ -3,13 +3,23 @@ var LENGTH = 25;
 var R = 12;
 var BLACK = 1;
 var WHITE = 2;
-var API_URL = 'http://localhost:5000';
+const API_URL = 'http://localhost:5000';
 var app = {};
+var AI_URL = 'http://localhost:6006';
 
+var SGF_STR = 'abcdefghijklmnopqrstuvwxyz';
+var Constant =
+    {
+        mode: {
+            AI: 0
+        }
+    };
 
 var game = {
     isInit: false,
-
+    mode: undefined,
+    game_id: undefined,
+    msg: '',
     init: function () {
         if (!this.isInit) {
             this.canvas = $("#ChessBoard")[0];
@@ -113,6 +123,9 @@ var game = {
             this.board[x + y * 19] = side;
             this.flush();
             this.saveStep();
+            if (game.mode === Constant.mode.AI && side === BLACK) {
+                getAIReply(x, y, game.game_id);
+            }
             return true;
         }
         console.log("[playAt] ERROR:", x, y, "has been occupied");
@@ -141,7 +154,7 @@ var game = {
 
     showScores: function (board) {
         if (board.length !== 361) {
-            console.log("[showScores] ERROR: incomplete dada -- length", board.length);
+            console.log("[showScores] ERROR: incomplete data -- length", board.length);
             return;
         }
 
@@ -250,28 +263,14 @@ function getScore() {
 }
 
 function loadSGF() {
-    var target_file = $("#sgf_list").val();
-
-    SGFViewer.currentGameName = target_file;
-    SGFViewer.gotoStep(1)
-
-    // $.get(API_URL + '/sgf/p/' + target_file, success = function (data) {
-    //     console.log(data);
-    //     game.board = data["board"];
-    //     game.flush();
-    //
-    //     $('#PB').text(data["black name"]);
-    //     $('#PW').text(data["white name"]);
-    //     $('#winner').text(data["winner"]);
-    //     $('#date').text(data["date"])
-    //
-    // });
+    SGFViewer.currentGameName = $("#sgf_list").val();
+    SGFViewer.gotoStep(1);
 
 }
 
 function getSGF() {
     $.get(API_URL + '/sgf', success = function (data) {
-        console.log('[getSGF] INFO: ', data)
+        console.log('[getSGF] INFO: ', data);
         app.sgfs = data;
 
         for (var i = 0; i < app.sgfs.length; i++) {
@@ -279,3 +278,82 @@ function getSGF() {
         }
     })
 }
+
+function activateAI() {
+    if (game.game_id === undefined) {
+        game.mode = Constant.mode.AI;
+        game.game_id = Math.round(Math.random() * 100000);
+        console.log(game.game_id);
+
+        $.get(AI_URL + '/game?game_id=' + game.game_id, success = function (data) {
+            console.log(game.game_id)
+        });
+
+
+        //$.put(AI_URL + '/game', {"game_id": game.game_id});
+    }
+
+}
+
+function getAIReply(x, y, game_id) {
+    game.msg += 'B[' + SGF_STR[x] + SGF_STR[y] + '];';
+    $.post(AI_URL + '/game', {"game_id": game_id, "msg": game.msg}, success = function (data) {
+
+        var moves = data["msg"].split(';');
+        moves.pop();
+        var move = moves[moves.length - 1];
+        game.msg += move;
+        var ai_x = SGF_STR.indexOf(move[2]);
+        var ai_y = SGF_STR.indexOf(move[3]);
+        game.playAt(ai_x, ai_y, 2);
+        changeSide();
+    })
+}
+
+var SGFViewer = {
+    currentGameName: undefined,
+    currentStep: undefined,
+    totalStep: undefined,
+
+    gotoStep: function (step) {
+        $.get(API_URL + '/sgf/p/' + SGFViewer.currentGameName, {'step': step}, success = function (data) {
+            console.log(data);
+            SGFViewer.currentStep = step;
+            SGFViewer.totalStep = data['total step'];
+            game.board = data['board'];
+            game.flush();
+
+            $('#PB').text(data["black name"]);
+            $('#PW').text(data["white name"]);
+            $('#winner').text(data["winner"]);
+            $('#date').text(data["date"]);
+
+            $('#currentstep').val(step);
+            $('#totalstep').text(SGFViewer.totalStep);
+        })
+    },
+    begin: function () {
+        this.gotoStep(1);
+    },
+    next: function () {
+        this.gotoStep(parseInt($('#currentstep').val()) + 1);
+    },
+
+    next_more: function () {
+        this.gotoStep(parseInt($('#currentstep').val()) + 5);
+    },
+    previous: function () {
+        this.gotoStep(parseInt($('#currentstep').val()) - 1);
+    },
+
+    previous_more: function () {
+        this.gotoStep(parseInt($('#currentstep').val()) - 5);
+    },
+    end: function () {
+        this.gotoStep(SGFViewer.totalStep);
+    },
+    goto: function () {
+        this.gotoStep(parseInt($('#currentstep').val()));
+    }
+};
+
